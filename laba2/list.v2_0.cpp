@@ -49,11 +49,12 @@ public:
             current = current->next;
             other_current = other_current->next;
         }
-
+// Тут можно использовать copy&swap и переиспользования конструктора копирования
         return *this;
     }
 
     subforwardlist& operator=(subforwardlist&& other) {
+        // Вот отлично, тут есть swap. Везде бы так
         if (this != &other) {std::swap(head, other.head);}
         return *this;
     }
@@ -84,7 +85,8 @@ public:
         current->next = nullptr;
         return data;
     }
-
+// Тут во всех методах дальше используется функционал типа "найти указатель на ноду по индексу"
+// Это стоило бы вынести в отдельную функцию, чтобы переиспользовать.
     void push_forward(const T& data) {
         Node* new_node = new Node(data);
         new_node->next = head;
