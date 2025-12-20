@@ -89,12 +89,13 @@ public:
         for (unsigned i = 0; i < rows * cols; i++)
             data[i] = value;
     }
+// Эту логику с заполнением вектора одинаковыми значениями можно было вынести в соотвествующий конструктор вектора, было бы логичнее
 
     static Matrix Identity(unsigned rows, unsigned cols) {
-        Matrix I(rows, cols, T{});
+        Matrix I(rows, cols, T{});  // А какой дефотлный конструктор у типа T? Разве тут не должны быть нули?
         unsigned min_dim = (rows < cols) ? rows : cols;
         for (unsigned i = 0; i < min_dim; i++)
-            I(i, i) = 1;
+            I(i, i) = 1;  // 1 не имеет тип T, нужно использовать static_cast
         return I;
     }
 
@@ -119,10 +120,13 @@ public:
         }
         return A;
     }
+// Ну получается, что здесь генерируется матрица чисто диагональная, не очень репрезентативно для тестов
+// Хотелось бы что-то типа верхней или нижней треугольной матрицы, чтобы проверить расчет детерминанта
 
     unsigned rows() const { return rows_count; }
     unsigned cols() const { return cols_count; }
 
+// Два метода транспонирования можно определить один через другой, чтобы не переписывать лишний раз код
     Matrix& transpose() {
         Matrix temp(cols_count, rows_count);
         for (unsigned r = 0; r < rows_count; r++)
@@ -163,7 +167,7 @@ T determinant(const Matrix<T>& A)
         while (pivot < n && std::abs(temp(pivot, i)) < 1e-12)
             pivot++;
         if (pivot == n)
-            return T{};
+            return T{};        // ТО есть все же предполагается, что T{} -- это аналог нуля для типа Т
         if (pivot != i) {
             for (unsigned c = 0; c < n; c++)
                 std::swap(temp(i, c), temp(pivot, c));
@@ -179,6 +183,9 @@ T determinant(const Matrix<T>& A)
     }
     return det;
 }
+
+// Расчет детерминанта и тесты правильные, только генерация матрицы получилась не репрезентативная, на диагональной матрице может и более простой метод расчета применяться
+// Так фактические расчет детерминанта на диагональной матрице гоняет нули.
 
 void test(unsigned n, double det_value) {
     Matrix<double> A = Matrix<double>::getSpecificDeterminant(n, det_value);

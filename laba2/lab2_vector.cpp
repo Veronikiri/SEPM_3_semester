@@ -14,7 +14,7 @@ public:
         delete[] mas;
     }
     Subvector(const Subvector& other) : top(other.top), capacity(other.capacity) {
-        mas = new T[capacity];
+        mas = new T[capacity];        // это тоже можно загнать в список инициализации
         for (unsigned int i = 0; i < top; ++i) {
             mas[i] = other.mas[i];
         }
@@ -25,6 +25,7 @@ public:
         other.capacity = 0;
     }
     Subvector& operator=(const Subvector& other) {
+        // В идеале это реализовывается через идиому copy&swap, поскольку тут повторяется логика конструктора копирования
         if (this != &other) {
             delete[] mas;
             capacity = other.capacity;
@@ -37,6 +38,7 @@ public:
         return *this;
     }
     Subvector& operator=(Subvector&& other) {
+        // Свое состояние тут можно не удалять, а передать other вектору
         if (this != &other) {
             delete[] mas;
             mas = other.mas;
@@ -50,6 +52,9 @@ public:
     }
     bool push_back(const T& d) {
         if (top == capacity) {
+            // все что тут под if-statement -- это же просто resize на новую capacity, 
+            // нужно переиспользовать уже имеющийся код
+            
             unsigned int new_cap = (capacity == 0) ? 1 : capacity * 2;
             T* new_mas = new T[new_cap];
             for (unsigned int i = 0; i < top; ++i) {

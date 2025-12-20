@@ -21,6 +21,9 @@ public:
         while (current) {
             push_back(current->data);
             current = current->next;
+            // хорошо, что в этой функции переиспользован код push_back, но push_back каждый раз разматывает цепочку указателей с самого начала и до последнего элемента списка
+            // так что при таком написании асимптотическая сложность конструктора копирования получается n^2, что конечно сильно хуже линейной
+            // утверждается, что можно написать этот метод за линейную слонжость, но код не получится переиспользовать
         }
     }
 
@@ -33,7 +36,7 @@ public:
             clear();
             Node* current = other.head;
             while (current) {
-                push_back(current->data);
+                push_back(current->data); // комментарий аналогичный конструктору копирования
                 current = current->next;
             }
         }
@@ -42,6 +45,7 @@ public:
 
     subforwardlist& operator=(subforwardlist&& other) {
         if (this != &other) {
+            // опять же, можно свое состояние не чистить, а отдать в other
             clear();
             head = other.head;
             other.head = nullptr;
@@ -79,7 +83,7 @@ public:
         current->next = nullptr;
         return data;
     }
-
+// Далее в этих методах неявно используется код, который ищет указатель на ноду по индексу, его как раз можно было бы вынести в отдельный метод, как это сделано для clear
     void push_forward(const T& data) {
         Node* new_node = new Node(data);
         new_node->next = head;
